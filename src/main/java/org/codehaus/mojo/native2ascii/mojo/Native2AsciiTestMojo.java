@@ -5,6 +5,7 @@ package org.codehaus.mojo.native2ascii.mojo;
 
 import java.io.File;
 
+import org.apache.maven.model.Resource;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -43,5 +44,12 @@ public class Native2AsciiTestMojo extends Native2AsciiMojo {
   @Override
   protected File getTargetDirectory() {
     return targetDir;
+  }
+
+  @Override
+  protected void addTargetDirResource(Resource targetDirResource) {
+      if (this.project != null) {
+          this.project.addTestResource(targetDirResource);
+      }
   }
 }

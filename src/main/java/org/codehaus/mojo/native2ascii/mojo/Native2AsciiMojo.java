@@ -20,10 +20,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProject;
 import org.codehaus.mojo.native2ascii.Native2Ascii;
 
 /**
@@ -45,6 +47,8 @@ public class Native2AsciiMojo extends AbstractNative2AsciiMojo {
   @Parameter(defaultValue = "src/main/native2ascii")
   public File srcDir;
 
+  @Parameter(defaultValue = "${project}", readonly = true, required = true)
+  protected MavenProject project;
 
   @Override
   protected File getSourceDirectory() {
@@ -59,12 +63,23 @@ public class Native2AsciiMojo extends AbstractNative2AsciiMojo {
     return targetDir;
   }
 
+  /**
+   * @param targetDirResource target directory resource to add to project resources
+   */
+  protected void addTargetDirResource(Resource targetDirResource) {
+      if (this.project != null) {
+          this.project.addResource(targetDirResource);
+      }
+  }
 
   @Override
   public void executeTransformation(final Iterator<File> files) throws MojoExecutionException {
     if (!getTargetDirectory().exists()) {
       getTargetDirectory().mkdirs();
     }
+    Resource targetDirResource = new Resource();
+    targetDirResource.setDirectory(getTargetDirectory().getPath());
+    addTargetDirResource(targetDirResource);
 
     while (files.hasNext()) {
       File file = files.next();
